@@ -1,4 +1,4 @@
-# 10x-cards
+# FishSky inspired by 10x-cards
 
 Aplikacja do tworzenia i zarządzania zestawami fiszek edukacyjnych, wykorzystująca modele LLM do automatycznego generowania fiszek na podstawie dostarczonego tekstu.
 
