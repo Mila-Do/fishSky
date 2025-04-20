@@ -8,6 +8,7 @@
 An AI-powered flashcard creation and management system that helps users create high-quality study materials efficiently using LLM models.
 
 ## Table of Contents
+
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
@@ -27,6 +28,7 @@ An AI-powered flashcard creation and management system that helps users create h
 ## Tech Stack
 
 ### Frontend
+
 - [Astro](https://astro.build/) v5 - Fast and efficient web framework
 - [React](https://reactjs.org/) v19 - Interactive components
 - [TypeScript](https://www.typescriptlang.org/) v5 - Type safety
@@ -34,17 +36,20 @@ An AI-powered flashcard creation and management system that helps users create h
 - [Shadcn/ui](https://ui.shadcn.com/) - Accessible React components
 
 ### Backend
+
 - [Supabase](https://supabase.com/) - Backend-as-a-Service
   - PostgreSQL database
   - Built-in authentication
   - Type-safe SDK
 
 ### AI Integration
+
 - [OpenRouter.ai](https://openrouter.ai/) - LLM API aggregator
   - Access to multiple AI models
   - Cost management and usage limits
 
 ### DevOps
+
 - GitHub Actions - CI/CD pipelines
 - DigitalOcean - Docker-based hosting
 
@@ -59,22 +64,26 @@ An AI-powered flashcard creation and management system that helps users create h
 ### Installation
 
 1. Clone the repository
+
 ```bash
 git clone https://github.com/yourusername/10x-cards.git
 cd 10x-cards
 ```
 
 2. Install dependencies
+
 ```bash
 bun install
 ```
 
 3. Set up environment variables
+
 ```bash
 cp .env.example .env
 ```
 
 4. Start the development server
+
 ```bash
 bun dev
 ```
@@ -98,6 +107,7 @@ bun format       # Format code with Prettier
 ## Project Scope
 
 ### Current Features
+
 - User authentication and account management
 - AI-powered flashcard generation
 - Manual flashcard creation and editing
@@ -105,6 +115,7 @@ bun format       # Format code with Prettier
 - User data privacy and GDPR compliance
 
 ### MVP Limitations
+
 - No mobile applications (web-only)
 - No document import (PDF, DOCX)
 - No public API
@@ -113,6 +124,7 @@ bun format       # Format code with Prettier
 - Simple keyword-based flashcard search
 
 ### Success Metrics
+
 - 75% AI-generated flashcard acceptance rate
 - 75% of new flashcards created using AI
 - User engagement tracking through generation/acceptance statistics
@@ -122,10 +134,12 @@ bun format       # Format code with Prettier
 🚧 **Current Status**: In Development
 
 ### Version
+
 - Current Version: 0.0.1
 - Node Version Required: 22.14.0
 
 ### Development Focus
+
 - Core flashcard generation functionality
 - User authentication and data security
 - Basic spaced repetition implementation

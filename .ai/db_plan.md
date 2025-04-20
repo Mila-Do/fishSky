@@ -1,6 +1,7 @@
 ## 1. Lista tabel
 
 ### users
+
 - **id** UUID PRIMARY KEY DEFAULT gen_random_uuid()
 - **email** CITEXT UNIQUE NOT NULL
 - **password_hash** TEXT NOT NULL
@@ -8,6 +9,7 @@
 - **updated_at** TIMESTAMPTZ NOT NULL DEFAULT now()
 
 ### generations
+
 - **id** UUID PRIMARY KEY DEFAULT gen_random_uuid()
 - **user_id** UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
 - **model** VARCHAR NOT NULL
@@ -21,6 +23,7 @@
 - **updated_at** TIMESTAMPTZ NOT NULL DEFAULT now()
 
 ### generation_error_logs
+
 - **id** UUID PRIMARY KEY DEFAULT gen_random_uuid()
 - **user_id** UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
 - **model** VARCHAR NOT NULL
@@ -31,6 +34,7 @@
 - **created_at** TIMESTAMPTZ NOT NULL DEFAULT now()
 
 ### flashcards
+
 - **id** UUID PRIMARY KEY DEFAULT gen_random_uuid()
 - **user_id** UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
 - **generation_id** UUID REFERENCES generations(id) ON DELETE SET NULL
@@ -44,12 +48,14 @@
 - **deleted_at** TIMESTAMPTZ
 
 ## 2. Relacje
-- **users 1—* flashcards**
-- **users 1—* generations**
-- **users 1—* generation_error_logs**
-- **generations 1—* flashcards**
+
+- **users 1—\* flashcards**
+- **users 1—\* generations**
+- **users 1—\* generation_error_logs**
+- **generations 1—\* flashcards**
 
 ## 3. Indeksy
+
 - `CREATE INDEX idx_flashcards_user_id ON flashcards(user_id);`
 - `CREATE INDEX idx_flashcards_user_status ON flashcards(user_id, status);`
 - `CREATE INDEX idx_flashcards_generation_id ON flashcards(generation_id);`
@@ -57,17 +63,20 @@
 - `CREATE INDEX idx_generation_error_logs_user_id ON generation_error_logs(user_id);`
 
 ## 4. Zasady PostgreSQL (RLS)
+
 - `ALTER TABLE flashcards ENABLE ROW LEVEL SECURITY;`
 - `ALTER TABLE generations ENABLE ROW LEVEL SECURITY;`
 - `ALTER TABLE generation_error_logs ENABLE ROW LEVEL SECURITY;`
 
 Polityki dla każdej tabeli (flashcards, generations, generation_error_logs):
+
 - SELECT: `auth.uid() = user_id`
 - INSERT: `auth.uid() = user_id`
 - UPDATE: `auth.uid() = user_id` (tylko dla flashcards i generations)
 - DELETE: `auth.uid() = user_id` (tylko dla flashcards i generations)
 
 ## 5. Dodatkowe uwagi
+
 - Rozszerzenia: `CREATE EXTENSION IF NOT EXISTS pgcrypto;`, `CREATE EXTENSION IF NOT EXISTS citext;`
 - Definicja ENUM:
   - `CREATE TYPE flashcard_status AS ENUM ('pending', 'accepted', 'rejected', 'custom');`
@@ -77,4 +86,3 @@ Polityki dla każdej tabeli (flashcards, generations, generation_error_logs):
 - Śledzenie generowania AI przez tabelę `generations` i logowanie błędów w `generation_error_logs`.
 - Backupy i retencja danych zgodnie z wymogami RODO.
 - Normalizacja do 3NF.
-
