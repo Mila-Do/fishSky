@@ -25,27 +25,27 @@
 #### GET `/flashcards`
 **Description**: List user's flashcards.
 **Query Parameters**: 
-- `status`: flashcard_status (optional)
-- `source`: flashcard_source (optional)
-- `page`: number (default: 1)
-- `limit`: number (default: 20)
-- `sort`: string (default: "-created_at")
-- `search`: string (optional)
+- `flashcardStatus`: flashcard_status (optional)
+- `flashcardSource`: flashcard_source (optional)
+- `paginationPage`: number (default: 1)
+- `paginationLimit`: number (default: 20)
+- `listSort`: string (default: "-createdAt")
+- `flashcardSearch`: string (optional)
 **Response JSON**: 
 ```json
 {
-  "items": [Flashcard],
-  "metadata": {
-    "total": "number",
-    "page": "number",
-    "limit": "number",
-    "has_more": "boolean"
+  "listItems": [Flashcard],
+  "listMetadata": {
+    "paginationTotal": "number",
+    "paginationPage": "number",
+    "paginationLimit": "number",
+    "paginationHasMore": "boolean"
   }
 }
 ```
 **Errors**: 401 Unauthorized.
 
-#### GET `/flashcards/{id}`
+#### GET `/flashcards/{flashcardId}`
 **Description**: Get a single flashcard.
 **Response JSON**: Flashcard object.
 **Errors**: 404 if flashcard not found, 401 Unauthorized.
@@ -53,27 +53,26 @@
 #### POST `/flashcards`
 **Description**: Create flashcard(s), manually or via AI.
 **Query Parameters**:
-- `source`: "manual" | "ai-full" | "ai-edited"
-- `model`: string (required if source starts with "ai-")
+- `flashcardSource`: "manual" | "ai-full" | "ai-edited"
 **Request JSON**: Flashcard data or text for AI generation.
 **Response JSON**: Created flashcard(s).
 **Errors**: 400 for invalid input, 401 Unauthorized.
 **Validations**:
-- `front`: Maximum length: 200 characters.
-- `back`: Maximum length: 500 characters.
-- `text`: Required for AI generation, 1000-10000 characters.
-- `generation_id`: Must match source type rules.
+- `flashcardFront`: Maximum length: 200 characters.
+- `flashcardBack`: Maximum length: 500 characters.
+- `generationSourceText`: Required for AI generation, 1000-10000 characters.
+- `flashcardGenerationId`: Must match source type rules.
 
 #### POST `/flashcards/batch`
 **Description**: Create multiple flashcards at once.
 **Request JSON**:
 ```json
 {
-  "flashcards": [
+  "flashcardList": [
     {
-      "front": "string",
-      "back": "string",
-      "source": "manual"
+      "flashcardFront": "string",
+      "flashcardBack": "string",
+      "flashcardSource": "manual"
     }
   ]
 }
@@ -81,148 +80,100 @@
 **Response JSON**:
 ```json
 {
-  "items": [
+  "listItems": [
     {
-      "id": "uuid",
-      "front": "string",
-      "back": "string",
-      "status": "pending",
-      "source": "manual",
-      "created_at": "timestamp"
+      "flashcardId": "uuid",
+      "flashcardFront": "string",
+      "flashcardBack": "string",
+      "flashcardStatus": "pending",
+      "flashcardSource": "manual",
+      "flashcardCreatedAt": "timestamp"
     }
   ],
-  "total": "number"
+  "listTotal": "number"
 }
 ```
 
 ### AI Generation
 
 #### POST `/generations`
-**Description**: Generate flashcards from text.
+**Description**: Generate flashcard proposals from text. These are suggestions that require user review and approval before becoming actual flashcards.
 **Query Parameters**:
-- `status`: "pending" | "accepted_unedited" | "accepted_edited" (default: "pending")
+- `flashcardStatus`: "pending" | "accepted" | "rejected" (default: "pending")
 **Request JSON**:
 ```json
 {
-  "text": "string",
-  "model": "string"
+  "generationSourceText": "string"
 }
 ```
 **Response JSON**:
 ```json
 {
-  "id": "uuid",
-  "flashcards": [
-    {
-      "id": "uuid",
-      "front": "string",
-      "back": "string",
-      "status": "string",
-      "source": "ai",
-      "model": "string"
-    }
-  ],
-  "generation_stats": {
-    "duration": "number",
-    "generated_count": "number"
+  "apiData": {
+    "generationId": "uuid",
+    "generationFlashcardProposals": [
+      {
+        "flashcardFront": "string",
+        "flashcardBack": "string",
+        "flashcardSource": "ai-full"
+      }
+    ],
+    "generationCount": 5,
+    "generationDuration": 1200
+  },
+  "apiMetadata": {
+    "apiTimestamp": "string",
+    "apiRequestId": "string"
   }
 }
 ```
 
-#### PATCH `/flashcards/{id}`
+#### PATCH `/flashcards/{flashcardId}`
 **Description**: Edit an existing flashcard.
 **Request JSON**: Fields to update.
 **Response JSON**: Updated flashcard object.
 **Errors**: 400 for invalid input, 404 if flashcard not found, 401 Unauthorized.
 **Validations**:
-- `front`: Maximum length: 200 characters.
-- `back`: Maximum length: 500 characters.
-- `source`: Must be one of `ai-edited` or `manual`.
-- `generation_id`: Required for `ai-edited`, must be null for `manual`.
+- `flashcardFront`: Maximum length: 200 characters.
+- `flashcardBack`: Maximum length: 500 characters.
+- `flashcardSource`: Must be one of `ai-edited` or `manual`.
+- `flashcardGenerationId`: Required for `ai-edited`, must be null for `manual`.
 
-#### DELETE `/flashcards/{id}`
+#### DELETE `/flashcards/{flashcardId}`
 **Description**: Delete a flashcard.
 **Response JSON**: Success message.
 **Errors**: 404 if flashcard not found, 401 Unauthorized.
 
 #### GET `/generations/stats`
-**Description**: Get generation statistics.
+**Description**: Get statistics about AI-generated flashcard proposals and their acceptance rates.
 **Response JSON**:
 ```json
 {
-  "total_generated": "number",
-  "accepted_unedited": "number",
-  "accepted_edited": "number",
-  "rejected": "number"
+  "generationTotalProposed": "number",
+  "generationAcceptedCount": "number",
+  "generationAcceptedEditedCount": "number",
+  "generationRejectedCount": "number"
 }
 ```
 
 #### GET `/generations`
 **Description**: List generation history.
 **Query Parameters**: 
-- `page`: number (default: 1)
-- `limit`: number (default: 20)
+- `paginationPage`: number (default: 1)
+- `paginationLimit`: number (default: 20)
 **Response JSON**: 
 ```json
 {
-  "items": [Generation],
-  "metadata": {
-    "total": "number",
-    "page": "number",
-    "limit": "number",
-    "has_more": "boolean"
+  "listItems": [Generation],
+  "listMetadata": {
+    "paginationTotal": "number",
+    "paginationPage": "number",
+    "paginationLimit": "number",
+    "paginationHasMore": "boolean"
   }
 }
 ```
 
-### Learning Session
-
-#### GET `/learning/session`
-**Description**: Get flashcards for learning session.
-**Query Parameters**: 
-- `limit`: number (default: 20)
-**Response JSON**:
-```json
-{
-  "session_id": "string",
-  "flashcards": [
-    {
-      "id": "uuid",
-      "front": "string",
-      "back": "string",
-      "status": "string",
-      "source": "string"
-    }
-  ],
-  "total": "number"
-}
-```
-**Errors**: 401 Unauthorized.
-
-#### POST `/learning/session/{session_id}/answer`
-**Description**: Submit answer for a flashcard.
-**Request JSON**:
-```json
-{
-  "flashcard_id": "uuid",
-  "answer": "string",
-  "confidence": "number" // 1-5 scale
-}
-```
-**Response JSON**:
-```json
-{
-  "next_flashcard": {
-    "id": "uuid",
-    "front": "string",
-    "back": "string",
-    "status": "string",
-    "source": "string"
-  } | null,
-  "session_complete": "boolean"
-}
-```
-**Errors**: 400 for invalid input, 404 if session not found, 401 Unauthorized.
 
 ## 3. Authentication and Authorization
 
@@ -235,22 +186,22 @@
 ## 4. Validation and Business Logic
 
 ### Input Validation
-- Email: valid format, unique
-- Password: minimum 8 characters, complexity requirements
-- Flashcard front: max 200 characters
-- Flashcard back: max 500 characters
-- Generation text: 1000-10000 characters
-- Status: enum values (pending, accepted, rejected, custom)
-- Source: enum values (ai, manual)
+- userEmail: valid format, unique
+- userPassword: minimum 8 characters, complexity requirements
+- flashcardFront: max 200 characters
+- flashcardBack: max 500 characters
+- generationSourceText: 1000-10000 characters
+- flashcardStatus: enum values (pending, accepted, rejected, custom)
+- flashcardSource: enum values (ai-full, manual, ai-edited)
 
 ### Response Format
 All responses follow the format:
 ```json
 {
-  "data": <response_data>,
-  "metadata": {
-    "timestamp": "string",
-    "request_id": "string"
+  "apiData": <response_data>,
+  "apiMetadata": {
+    "apiTimestamp": "string",
+    "apiRequestId": "string"
   }
 }
 ```
@@ -258,25 +209,25 @@ All responses follow the format:
 For errors:
 ```json
 {
-  "error": {
-    "code": "string",
-    "message": "string",
-    "details": object | null
+  "apiError": {
+    "apiErrorCode": "string",
+    "apiErrorMessage": "string",
+    "apiErrorDetails": object | null
   },
-  "metadata": {
-    "timestamp": "string",
-    "request_id": "string"
+  "apiMetadata": {
+    "apiTimestamp": "string",
+    "apiRequestId": "string"
   }
 }
 ```
 
 ### Business Logic
-- Flashcard generation uses AI model through OpenRouter
-- Learning session uses spaced repetition algorithm
-- Soft delete for flashcards (sets deleted_at)
-- Generation statistics tracking
+- AI generates flashcard proposals using a predefined model
+- Proposals require user review and approval
+- Soft delete for flashcards (sets flashcardDeletedAt)
+- Generation proposal statistics tracking
 - Error logging for failed generations
 - Source validation:
-  - "manual": generation_id must be null
-  - "ai-full": generation_id required, matches the AI generation
-  - "ai-edited": generation_id required, matches the original AI generation 
+  - "manual": flashcardGenerationId must be null
+  - "ai-full": flashcardGenerationId required, matches the AI generation that was accepted without edits
+  - "ai-edited": flashcardGenerationId required, matches the original AI generation proposal that was edited before acceptance 

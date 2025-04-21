@@ -1,4 +1,10 @@
-﻿export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+﻿export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
 
 export interface Database {
   graphql_public: {
@@ -22,173 +28,173 @@ export interface Database {
     Tables: {
       flashcards: {
         Row: {
-          ai_metadata: Json | null;
-          back: string;
-          created_at: string;
-          deleted_at: string | null;
-          front: string;
-          generation_id: string | null;
           id: string;
-          source: Database["public"]["Enums"]["flashcard_source"];
-          status: Database["public"]["Enums"]["flashcard_status"];
-          updated_at: string;
-          user_id: string;
+          userId: string;
+          generationId: string | null;
+          front: string;
+          back: string;
+          status: Database['public']['Enums']['flashcard_status'];
+          source: Database['public']['Enums']['flashcard_source'];
+          aiMetadata: Json | null;
+          createdAt: string;
+          updatedAt: string;
+          deletedAt: string | null;
         };
         Insert: {
-          ai_metadata?: Json | null;
-          back: string;
-          created_at?: string;
-          deleted_at?: string | null;
-          front: string;
-          generation_id?: string | null;
           id?: string;
-          source: Database["public"]["Enums"]["flashcard_source"];
-          status?: Database["public"]["Enums"]["flashcard_status"];
-          updated_at?: string;
-          user_id: string;
+          userId: string;
+          generationId?: string | null;
+          front: string;
+          back: string;
+          status?: Database['public']['Enums']['flashcard_status'];
+          source: Database['public']['Enums']['flashcard_source'];
+          aiMetadata?: Json | null;
+          createdAt?: string;
+          updatedAt?: string;
+          deletedAt?: string | null;
         };
         Update: {
-          ai_metadata?: Json | null;
-          back?: string;
-          created_at?: string;
-          deleted_at?: string | null;
-          front?: string;
-          generation_id?: string | null;
           id?: string;
-          source?: Database["public"]["Enums"]["flashcard_source"];
-          status?: Database["public"]["Enums"]["flashcard_status"];
-          updated_at?: string;
-          user_id?: string;
+          userId?: string;
+          generationId?: string | null;
+          front?: string;
+          back?: string;
+          status?: Database['public']['Enums']['flashcard_status'];
+          source?: Database['public']['Enums']['flashcard_source'];
+          aiMetadata?: Json | null;
+          createdAt?: string;
+          updatedAt?: string;
+          deletedAt?: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: "flashcards_generation_id_fkey";
-            columns: ["generation_id"];
+            foreignKeyName: 'flashcards_userId_fkey';
+            columns: ['userId'];
             isOneToOne: false;
-            referencedRelation: "generations";
-            referencedColumns: ["id"];
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
           },
           {
-            foreignKeyName: "flashcards_user_id_fkey";
-            columns: ["user_id"];
+            foreignKeyName: 'flashcards_generationId_fkey';
+            columns: ['generationId'];
             isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
+            referencedRelation: 'generations';
+            referencedColumns: ['id'];
           },
         ];
       };
-      generation_error_logs: {
+      generationErrorLogs: {
         Row: {
-          created_at: string;
-          error_code: string;
-          error_message: string;
           id: string;
+          userId: string;
           model: string;
-          source_text_hash: string;
-          source_text_length: number;
-          user_id: string;
+          sourceTextHash: string;
+          sourceTextLength: number;
+          errorCode: string;
+          errorMessage: string;
+          createdAt: string;
         };
         Insert: {
-          created_at?: string;
-          error_code: string;
-          error_message: string;
           id?: string;
+          userId: string;
           model: string;
-          source_text_hash: string;
-          source_text_length: number;
-          user_id: string;
+          sourceTextHash: string;
+          sourceTextLength: number;
+          errorCode: string;
+          errorMessage: string;
+          createdAt?: string;
         };
         Update: {
-          created_at?: string;
-          error_code?: string;
-          error_message?: string;
           id?: string;
+          userId?: string;
           model?: string;
-          source_text_hash?: string;
-          source_text_length?: number;
-          user_id?: string;
+          sourceTextHash?: string;
+          sourceTextLength?: number;
+          errorCode?: string;
+          errorMessage?: string;
+          createdAt?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "generation_error_logs_user_id_fkey";
-            columns: ["user_id"];
+            foreignKeyName: 'generationErrorLogs_userId_fkey';
+            columns: ['userId'];
             isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
           },
         ];
       };
       generations: {
         Row: {
-          accepted_edited_count: number;
-          accepted_unedited_count: number;
-          created_at: string;
-          generated_count: number;
-          generation_duration: number;
           id: string;
+          userId: string;
           model: string;
-          source_text_hash: string;
-          source_text_length: number;
-          updated_at: string;
-          user_id: string;
+          generatedCount: number;
+          acceptedUneditedCount: number;
+          acceptedEditedCount: number;
+          sourceTextHash: string;
+          sourceTextLength: number;
+          generationDuration: number;
+          createdAt: string;
+          updatedAt: string;
         };
         Insert: {
-          accepted_edited_count?: number;
-          accepted_unedited_count?: number;
-          created_at?: string;
-          generated_count?: number;
-          generation_duration: number;
           id?: string;
+          userId: string;
           model: string;
-          source_text_hash: string;
-          source_text_length: number;
-          updated_at?: string;
-          user_id: string;
+          generatedCount?: number;
+          acceptedUneditedCount?: number;
+          acceptedEditedCount?: number;
+          sourceTextHash: string;
+          sourceTextLength: number;
+          generationDuration: number;
+          createdAt?: string;
+          updatedAt?: string;
         };
         Update: {
-          accepted_edited_count?: number;
-          accepted_unedited_count?: number;
-          created_at?: string;
-          generated_count?: number;
-          generation_duration?: number;
           id?: string;
+          userId?: string;
           model?: string;
-          source_text_hash?: string;
-          source_text_length?: number;
-          updated_at?: string;
-          user_id?: string;
+          generatedCount?: number;
+          acceptedUneditedCount?: number;
+          acceptedEditedCount?: number;
+          sourceTextHash?: string;
+          sourceTextLength?: number;
+          generationDuration?: number;
+          createdAt?: string;
+          updatedAt?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "generations_user_id_fkey";
-            columns: ["user_id"];
+            foreignKeyName: 'generations_userId_fkey';
+            columns: ['userId'];
             isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
           },
         ];
       };
       users: {
         Row: {
-          created_at: string;
-          email: string;
           id: string;
-          password_hash: string;
-          updated_at: string;
+          email: string;
+          passwordHash: string;
+          createdAt: string;
+          updatedAt: string;
         };
         Insert: {
-          created_at?: string;
-          email: string;
           id?: string;
-          password_hash: string;
-          updated_at?: string;
+          email: string;
+          passwordHash: string;
+          createdAt?: string;
+          updatedAt?: string;
         };
         Update: {
-          created_at?: string;
-          email?: string;
           id?: string;
-          password_hash?: string;
-          updated_at?: string;
+          email?: string;
+          passwordHash?: string;
+          createdAt?: string;
+          updatedAt?: string;
         };
         Relationships: [];
       };
@@ -196,59 +202,61 @@ export interface Database {
     Views: Record<never, never>;
     Functions: {
       citext: {
-        Args: { "": string } | { "": boolean } | { "": unknown };
+        Args: { '': string } | { '': boolean } | { '': unknown };
         Returns: string;
       };
       citext_hash: {
-        Args: { "": string };
+        Args: { '': string };
         Returns: number;
       };
       citextin: {
-        Args: { "": unknown };
+        Args: { '': unknown };
         Returns: string;
       };
       citextout: {
-        Args: { "": string };
+        Args: { '': string };
         Returns: unknown;
       };
       citextrecv: {
-        Args: { "": unknown };
+        Args: { '': unknown };
         Returns: string;
       };
       citextsend: {
-        Args: { "": string };
+        Args: { '': string };
         Returns: string;
       };
     };
     Enums: {
-      flashcard_source: "ai" | "manual";
-      flashcard_status: "pending" | "accepted" | "rejected" | "custom";
+      flashcard_source: 'ai-full' | 'ai-edited' | 'manual';
+      flashcard_status: 'pending' | 'accepted' | 'rejected' | 'custom';
     };
     CompositeTypes: Record<never, never>;
   };
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">];
+type DefaultSchema = Database[Extract<keyof Database, 'public'>];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
     | { schema: keyof Database },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof Database;
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+  ? (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R;
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] &
+        DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] &
+        DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R;
       }
       ? R
@@ -256,20 +264,22 @@ export type Tables<
     : never;
 
 export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"] | { schema: keyof Database },
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema['Tables']
+    | { schema: keyof Database },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof Database;
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I;
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I;
       }
       ? I
@@ -277,20 +287,22 @@ export type TablesInsert<
     : never;
 
 export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"] | { schema: keyof Database },
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema['Tables']
+    | { schema: keyof Database },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof Database;
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U;
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U;
       }
       ? U
@@ -298,29 +310,33 @@ export type TablesUpdate<
     : never;
 
 export type Enums<
-  DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"] | { schema: keyof Database },
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema['Enums']
+    | { schema: keyof Database },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof Database;
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+  ? Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never;
 
 export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"] | { schema: keyof Database },
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema['CompositeTypes']
+    | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof Database;
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never;
 
 export const Constants = {
@@ -329,8 +345,8 @@ export const Constants = {
   },
   public: {
     Enums: {
-      flashcard_source: ["ai", "manual"],
-      flashcard_status: ["pending", "accepted", "rejected", "custom"],
+      flashcard_source: ['ai-full', 'ai-edited', 'manual'],
+      flashcard_status: ['pending', 'accepted', 'rejected', 'custom'],
     },
   },
 } as const;
