@@ -35,11 +35,13 @@ Endpoint `/generations` służy do generowania propozycji fiszek (flashcards) na
 ## 4. Szczegóły odpowiedzi
 
 - **Kody statusu**:
+
   - 201 Created - Sukces, pomyślnie wygenerowano propozycje fiszek
   - 400 Bad Request - Nieprawidłowe dane wejściowe
   - 500 Internal Server Error - Błąd serwera
 
 - **Format odpowiedzi (sukces)**:
+
   ```json
   {
     "apiData": {
@@ -87,7 +89,7 @@ Endpoint `/generations` służy do generowania propozycji fiszek (flashcards) na
 
 ## 6. Względy bezpieczeństwa
 
-- **Walidacja danych**: 
+- **Walidacja danych**:
   - Weryfikacja długości tekstu (1000-10000 znaków)
   - Sanityzacja wejścia przed wysłaniem do modelu AI
 - **Rate limiting**: Ograniczenie liczby żądań do usługi AI
@@ -117,6 +119,7 @@ W przypadku błędów AI, informacje o błędzie będą rejestrowane w tabeli `g
 2. **Implementacja walidacji żądania** przy użyciu `zod` (sprawdzenie długości `generationSourceText`).
 
 3. **Stworzenie serwisu** (`generation.service`), który:
+
    - Integruje się z zewnętrznym serwisem AI. Na etapie developmentu skorzystamy z mocków zamiast wywoływania serwisu AI.
    - Obsługuje logikę zapisu do tabeli `generations` oraz rejestracji błędów w `generation_error_logs`.
 
@@ -124,4 +127,4 @@ W przypadku błędów AI, informacje o błędzie będą rejestrowane w tabeli `g
 
 5. **Implementacja logiki endpointu**, wykorzystującej utworzony serwis.
 
-6. **Dodanie szczegółowego logowania** akcji i błędów. 
+6. **Dodanie szczegółowego logowania** akcji i błędów.

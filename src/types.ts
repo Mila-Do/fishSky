@@ -73,7 +73,7 @@ export interface FlashcardProposalDTO {
   flashcardId: string;
   flashcardFront: string;
   flashcardBack: string;
-  flashcardStatus: 'pending';
+  flashcardStatus: FlashcardStatus;
   flashcardSource: 'ai-full';
 }
 

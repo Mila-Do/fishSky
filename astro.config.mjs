@@ -12,9 +12,9 @@ export default defineConfig({
   integrations: [react(), sitemap()],
   server: { port: 3000 },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss()]
   },
   adapter: node({
-    mode: 'standalone',
-  }),
+    mode: 'standalone'
+  })
 });

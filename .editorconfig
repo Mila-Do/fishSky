@@ -2,4 +2,13 @@ root = true
 
 [*]
 end_of_line = crlf
-insert_final_newline = true 
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+
+[*.{js,jsx,ts,tsx,css,astro,json}]
+indent_style = space
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false 
