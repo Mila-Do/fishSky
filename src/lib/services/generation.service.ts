@@ -22,9 +22,9 @@ const SAMPLE_TOPICS = [
 
 enum AIServiceErrorType {
   TIMEOUT = 'timeout',
-  CONTENT_POLICY = 'content_policy',
-  SERVER_OVERLOAD = 'server_overload',
-  INVALID_RESPONSE = 'invalid_response',
+  CONTENT_POLICY = 'contentPolicy',
+  SERVER_OVERLOAD = 'serverOverload',
+  INVALID_RESPONSE = 'invalidResponse',
   UNKNOWN = 'unknown',
 }
 

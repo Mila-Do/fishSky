@@ -6,7 +6,7 @@ import type {
   ApiResponse,
 } from '../../lib/schemas/generation.schema';
 import type { GenerationGetResponseDTO, FlashcardStatus } from '../../types';
-import { default_user_ID } from '../../db/supabase.client';
+import { defaultUserId } from '../../db/supabase.client';
 
 export const prerender = false;
 
@@ -120,7 +120,7 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
   }
 
   // 2. Używamy domyślnego ID użytkownika - autoryzacja zostanie wdrożona później
-  const userId = default_user_ID;
+  const userId = defaultUserId;
 
   // 3. Validate request body
   let requestBody;

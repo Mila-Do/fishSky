@@ -3,107 +3,111 @@
 ## 1. Lista tabel
 
 ### users
-
 - **id** UUID PRIMARY KEY DEFAULT gen_random_uuid()
 - **email** CITEXT UNIQUE NOT NULL
-- **password_hash** TEXT NOT NULL
-- **created_at** TIMESTAMPTZ NOT NULL DEFAULT now()
-- **updated_at** TIMESTAMPTZ NOT NULL DEFAULT now()
-
-### generations
-
-- **id** UUID PRIMARY KEY DEFAULT gen_random_uuid()
-- **user_id** UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
-- **model** VARCHAR(100) NOT NULL
-- **generated_count** INT NOT NULL DEFAULT 0
-- **accepted_unedited_count** INT NOT NULL DEFAULT 0
-- **accepted_edited_count** INT NOT NULL DEFAULT 0
-- **source_text_hash** VARCHAR(64) NOT NULL
-- **source_text_length** INT NOT NULL CHECK (source_text_length BETWEEN 1000 AND 10000)
-- **generation_duration** INT NOT NULL
-- **created_at** TIMESTAMPTZ NOT NULL DEFAULT now()
-- **updated_at** TIMESTAMPTZ NOT NULL DEFAULT now()
-
-### generation_error_logs
-
-- **id** UUID PRIMARY KEY DEFAULT gen_random_uuid()
-- **user_id** UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
-- **model** VARCHAR(100) NOT NULL
-- **source_text_hash** VARCHAR(64) NOT NULL
-- **source_text_length** INT NOT NULL
-- **error_code** VARCHAR(100) NOT NULL
-- **error_message** TEXT NOT NULL
-- **created_at** TIMESTAMPTZ NOT NULL DEFAULT now()
+- **passwordHash** TEXT NOT NULL
+- **createdAt** TIMESTAMPTZ NOT NULL DEFAULT now()
+- **updatedAt** TIMESTAMPTZ NOT NULL DEFAULT now()
 
 ### flashcards
-
 - **id** UUID PRIMARY KEY DEFAULT gen_random_uuid()
-- **user_id** UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
-- **generation_id** UUID REFERENCES generations(id) ON DELETE SET NULL
-- **front** VARCHAR(200) NOT NULL CHECK (char_length(front) <= 200)
+- **aiMetadata** JSONB NULL
 - **back** VARCHAR(500) NOT NULL CHECK (char_length(back) <= 500)
-- **status** flashcard_status NOT NULL DEFAULT 'pending'
-- **source** flashcard_source NOT NULL
-- **ai_metadata** JSONB
-- **created_at** TIMESTAMPTZ NOT NULL DEFAULT now()
-- **updated_at** TIMESTAMPTZ NOT NULL DEFAULT now()
-- **deleted_at** TIMESTAMPTZ
+- **createdAt** TIMESTAMPTZ NOT NULL DEFAULT now()
+- **deletedAt** TIMESTAMPTZ NULL
+- **front** VARCHAR(200) NOT NULL CHECK (char_length(front) <= 200)
+- **generationId** UUID REFERENCES generations(id) ON DELETE SET NULL
+- **source** flashcardSource NOT NULL
+- **status** flashcardStatus NOT NULL DEFAULT 'pending'
+- **updatedAt** TIMESTAMPTZ NOT NULL DEFAULT now()
+- **userId** UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
+
+### generationErrorLogs
+- **id** UUID PRIMARY KEY DEFAULT gen_random_uuid()
+- **createdAt** TIMESTAMPTZ NOT NULL DEFAULT now()
+- **errorCode** VARCHAR(100) NOT NULL
+- **errorMessage** TEXT NOT NULL
+- **model** VARCHAR(100) NOT NULL
+- **sourceTextHash** VARCHAR(64) NOT NULL
+- **sourceTextLength** INT NOT NULL
+- **userId** UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
+
+### generations
+- **id** UUID PRIMARY KEY DEFAULT gen_random_uuid()
+- **acceptedEditedCount** INT NOT NULL DEFAULT 0
+- **acceptedUneditedCount** INT NOT NULL DEFAULT 0
+- **createdAt** TIMESTAMPTZ NOT NULL DEFAULT now()
+- **generatedCount** INT NOT NULL DEFAULT 0
+- **generationDuration** INT NOT NULL
+- **model** VARCHAR(100) NOT NULL
+- **sourceTextHash** VARCHAR(64) NOT NULL
+- **sourceTextLength** INT NOT NULL CHECK (sourceTextLength BETWEEN 1000 AND 10000)
+- **updatedAt** TIMESTAMPTZ NOT NULL DEFAULT now()
+- **userId** UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
 
 ## 2. Enumeracje
 
 ```sql
-CREATE TYPE flashcard_status AS ENUM ('pending', 'accepted', 'rejected', 'custom');
-CREATE TYPE flashcard_source AS ENUM ('manual', 'ai-full', 'ai-edited');
+CREATE TYPE "flashcardSource" AS ENUM ('manual', 'ai-full', 'ai-edited');
+CREATE TYPE "flashcardStatus" AS ENUM ('pending', 'accepted', 'rejected', 'custom');
 ```
 
-## 3. Relacje
+## 3. Relacje i klucze obce
 
-- **users 1—\* flashcards**
-- **users 1—\* generations**
-- **users 1—\* generation_error_logs**
-- **generations 1—\* flashcards**
+### flashcards
+- **flashcardsGenerationId_fkey**: "generationId" → generations("id")
+- **flashcardsUserId_fkey**: "userId" → users("id")
+
+### generationErrorLogs
+- **generationErrorLogsUserId_fkey**: "userId" → users("id")
+
+### generations
+- **generationsUserId_fkey**: "userId" → users("id")
 
 ## 4. Indeksy
 
-- `CREATE INDEX idx_flashcards_user_id ON flashcards(user_id);`
-- `CREATE INDEX idx_flashcards_user_status ON flashcards(user_id, status);`
-- `CREATE INDEX idx_flashcards_generation_id ON flashcards(generation_id);`
-- `CREATE INDEX idx_generations_user_id ON generations(user_id);`
-- `CREATE INDEX idx_generation_error_logs_user_id ON generation_error_logs(user_id);`
+- `CREATE INDEX "idxFlashcardsUserId" ON flashcards("userId");`
+- `CREATE INDEX "idxFlashcardsUserStatus" ON flashcards("userId", status);`
+- `CREATE INDEX "idxFlashcardsGenerationId" ON flashcards("generationId");`
+- `CREATE INDEX "idxGenerationsUserId" ON generations("userId");`
+- `CREATE INDEX "idxGenerationErrorLogsUserId" ON "generationErrorLogs"("userId");`
 
 ## 5. Dodatkowe ograniczenia
 
-- **flashcards_manual_source_check**: Fiszki ręczne (source = 'manual') muszą mieć NULL w generation_id
-- **flashcards_ai_source_check**: Fiszki AI (source = 'ai-full' lub 'ai-edited') muszą mieć NOT NULL w generation_id
-- **Ograniczenia długości**: front max 200 znaków, back max 500 znaków, source_text 1000-10000 znaków
+- **flashcardsManualSourceCheck**: Fiszki ręczne (source = 'manual') muszą mieć NULL w generationId
+- **flashcardsAiSourceCheck**: Fiszki AI (source = 'ai-full' lub 'ai-edited') muszą mieć NOT NULL w generationId
+- **Ograniczenia długości**: 
+  - front: max 200 znaków
+  - back: max 500 znaków
+  - sourceText: 1000-10000 znaków
 
 ## 6. Funkcje i triggery
 
 ```sql
--- Funkcja aktualizująca pole updated_at przy każdej modyfikacji
-CREATE OR REPLACE FUNCTION set_updated_at()
+-- Funkcja aktualizująca pole updatedAt przy każdej modyfikacji
+CREATE OR REPLACE FUNCTION "setUpdatedAt"()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.updated_at = now();
+    NEW."updatedAt" = now();
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Triggery automatycznie aktualizujące updated_at
-CREATE TRIGGER set_users_updated_at
+-- Triggery automatycznie aktualizujące updatedAt
+CREATE TRIGGER "setUsersUpdatedAt"
     BEFORE UPDATE ON users
     FOR EACH ROW
-    EXECUTE FUNCTION set_updated_at();
+    EXECUTE FUNCTION "setUpdatedAt"();
 
-CREATE TRIGGER set_flashcards_updated_at
+CREATE TRIGGER "setFlashcardsUpdatedAt"
     BEFORE UPDATE ON flashcards
     FOR EACH ROW
-    EXECUTE FUNCTION set_updated_at();
+    EXECUTE FUNCTION "setUpdatedAt"();
 
-CREATE TRIGGER set_generations_updated_at
+CREATE TRIGGER "setGenerationsUpdatedAt"
     BEFORE UPDATE ON generations
     FOR EACH ROW
-    EXECUTE FUNCTION set_updated_at();
+    EXECUTE FUNCTION "setUpdatedAt"();
 ```
 
 ## 7. Bezpieczeństwo i Row Level Security
@@ -113,48 +117,48 @@ CREATE TRIGGER set_generations_updated_at
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE flashcards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE generations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE generation_error_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "generationErrorLogs" ENABLE ROW LEVEL SECURITY;
 
 -- Polityki RLS dla users
-CREATE POLICY users_select_policy ON users
+CREATE POLICY "usersSelectPolicy" ON users
     FOR SELECT USING (auth.uid() = id);
 
 -- Polityki RLS dla flashcards
-CREATE POLICY flashcards_select_policy ON flashcards
-    FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "flashcardsSelectPolicy" ON flashcards
+    FOR SELECT USING (auth.uid() = "userId");
 
-CREATE POLICY flashcards_insert_policy ON flashcards
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "flashcardsInsertPolicy" ON flashcards
+    FOR INSERT WITH CHECK (auth.uid() = "userId");
 
-CREATE POLICY flashcards_update_policy ON flashcards
-    FOR UPDATE USING (auth.uid() = user_id)
-    WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "flashcardsUpdatePolicy" ON flashcards
+    FOR UPDATE USING (auth.uid() = "userId")
+    WITH CHECK (auth.uid() = "userId");
 
-CREATE POLICY flashcards_delete_policy ON flashcards
-    FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "flashcardsDeletePolicy" ON flashcards
+    FOR DELETE USING (auth.uid() = "userId");
 
 -- Polityki RLS dla generations
-CREATE POLICY generations_select_policy ON generations
-    FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "generationsSelectPolicy" ON generations
+    FOR SELECT USING (auth.uid() = "userId");
 
-CREATE POLICY generations_insert_policy ON generations
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "generationsInsertPolicy" ON generations
+    FOR INSERT WITH CHECK (auth.uid() = "userId");
 
-CREATE POLICY generations_update_policy ON generations
-    FOR UPDATE USING (auth.uid() = user_id)
-    WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "generationsUpdatePolicy" ON generations
+    FOR UPDATE USING (auth.uid() = "userId")
+    WITH CHECK (auth.uid() = "userId");
 
--- Polityki RLS dla generation_error_logs
-CREATE POLICY generation_error_logs_select_policy ON generation_error_logs
-    FOR SELECT USING (auth.uid() = user_id);
+-- Polityki RLS dla generationErrorLogs
+CREATE POLICY "generationErrorLogsSelectPolicy" ON "generationErrorLogs"
+    FOR SELECT USING (auth.uid() = "userId");
 
-CREATE POLICY generation_error_logs_insert_policy ON generation_error_logs
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "generationErrorLogsInsertPolicy" ON "generationErrorLogs"
+    FOR INSERT WITH CHECK (auth.uid() = "userId");
 ```
 
 ## 8. Uwagi implementacyjne
 
-- **Soft delete**: Używamy kolumny deleted_at dla fiszek zamiast fizycznego usuwania
+- **Soft delete**: Używamy kolumny deletedAt dla fiszek zamiast fizycznego usuwania
 - **Walidacja**: Dodatkowe walidacje wykonywane po stronie API (min/max długości, poprawność danych)
 - **Citext**: Używamy rozszerzenia CITEXT dla pól email, aby zapewnić case-insensitive wyszukiwanie
 - **Rozszerzenia**: Wymagane rozszerzenia: pgcrypto (generowanie UUID), citext (porównania niewrażliwe na wielkość liter)
@@ -163,10 +167,10 @@ CREATE POLICY generation_error_logs_insert_policy ON generation_error_logs
 
 - Rozszerzenia: `CREATE EXTENSION IF NOT EXISTS pgcrypto;`, `CREATE EXTENSION IF NOT EXISTS citext;`
 - Definicja ENUM:
-  - `CREATE TYPE flashcard_status AS ENUM ('pending', 'accepted', 'rejected', 'custom');`
-  - `CREATE TYPE flashcard_source AS ENUM ('ai-full', 'ai-edited', 'manual');`
-- Trigger `set_updated_at()` wywoływany przed UPDATE na tabele users, flashcards i generations aktualizuje pole `updated_at`.
-- Soft-delete w tabeli `flashcards` przez ustawienie `deleted_at` zamiast fizycznego usuwania.
-- Śledzenie generowania AI przez tabelę `generations` i logowanie błędów w `generation_error_logs`.
-- Backupy i retencja danych zgodnie z wymogami RODO.
-- Normalizacja do 3NF.
+  - `CREATE TYPE "flashcardSource" AS ENUM ('manual', 'ai-full', 'ai-edited');`
+  - `CREATE TYPE "flashcardStatus" AS ENUM ('pending', 'accepted', 'rejected', 'custom');`
+- Trigger `setUpdatedAt()` wywoływany przed UPDATE na tabele users, flashcards i generations aktualizuje pole `updatedAt`
+- Soft-delete w tabeli `flashcards` przez ustawienie `deletedAt` zamiast fizycznego usuwania
+- Śledzenie generowania AI przez tabelę `generations` i logowanie błędów w `generationErrorLogs`
+- Backupy i retencja danych zgodnie z wymogami RODO
+- Normalizacja do 3NF

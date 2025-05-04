@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcard API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .panel {
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow: auto;
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Flashcard API Test</h1>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>Create Single Flashcard</h2>
+            <textarea id="singleCardInput">{
+  "flashcardFront": "What is the capital of France?",
+  "flashcardBack": "Paris",
+  "flashcardSource": "manual",
+  "flashcardStatus": "accepted"
+}</textarea>
+            <button onclick="createFlashcard()">Create Flashcard</button>
+            <h3>Response:</h3>
+            <pre id="singleResponse"></pre>
+        </div>
+        
+        <div class="panel">
+            <h2>Create Flashcard Batch</h2>
+            <textarea id="batchCardInput">{
+  "flashcardList": [
+    {
+      "flashcardFront": "What is the largest planet in our solar system?",
+      "flashcardBack": "Jupiter",
+      "flashcardSource": "manual"
+    },
+    {
+      "flashcardFront": "What is the smallest planet in our solar system?",
+      "flashcardBack": "Mercury",
+      "flashcardSource": "manual"
+    }
+  ]
+}</textarea>
+            <button onclick="createFlashcardBatch()">Create Batch</button>
+            <h3>Response:</h3>
+            <pre id="batchResponse"></pre>
+        </div>
+    </div>
+
+    <script>
+        async function createFlashcard() {
+            const inputData = document.getElementById('singleCardInput').value;
+            const responseElem = document.getElementById('singleResponse');
+            
+            try {
+                const response = await fetch('/api/flashcards', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: inputData
+                });
+                
+                const data = await response.json();
+                responseElem.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseElem.textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        async function createFlashcardBatch() {
+            const inputData = document.getElementById('batchCardInput').value;
+            const responseElem = document.getElementById('batchResponse');
+            
+            try {
+                const response = await fetch('/api/flashcards/batch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: inputData
+                });
+                
+                const data = await response.json();
+                responseElem.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseElem.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html> 
